@@ -1,6 +1,6 @@
 from typing import List
 
-from sqlalchemy import MetaData, Table, Column, ARRAY, Boolean
+from sqlalchemy import MetaData, Table, Column, Boolean, Text
 from sqlalchemy.orm import Mapped, mapped_column
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from sqlalchemy import Integer, String
@@ -16,12 +16,13 @@ user = Table(
     Column("email", String, unique=True, index=True, nullable=False),
     Column("username", String, nullable=False),
     Column("surname", String, nullable=False),
-    Column("avatar", String),
+    Column("avatar", Text),
+    Column("bgImg", Text),
+    Column("edu", String),
     Column("info", String, nullable=False),
     Column("city", String, nullable=False),
     Column("hashed_password", String, nullable=False),
     Column("num_telephone", String, nullable=False),
-    Column("friends", ARRAY(Integer)),
     Column("is_active", Boolean, nullable=False),
     Column("is_superuser", Boolean, nullable=False),
     Column("is_verified", Boolean, nullable=False)
@@ -42,6 +43,12 @@ class User(SQLAlchemyBaseUserTable[int], Base):
         String(length=320), nullable=False
     )
     avatar: Mapped[str] = mapped_column(
+        Text
+    )
+    bgImg: Mapped[str] = mapped_column(
+        Text
+    )
+    edu: Mapped[str] = mapped_column(
         String(length=1024)
     )
     info: Mapped[str] = mapped_column(
@@ -49,9 +56,6 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     )
     city: Mapped[str] = mapped_column(
         String(length=320), nullable=False
-    )
-    friends: Mapped[List[int]] = mapped_column(
-        ARRAY(Integer)
     )
     num_telephone: Mapped[str] = mapped_column(
         String(length=320), nullable=False
