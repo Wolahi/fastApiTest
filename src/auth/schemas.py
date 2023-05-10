@@ -1,14 +1,13 @@
 from fastapi_users import schemas
 
 
-
 class UserRead(schemas.BaseUser[int]):
     id: int
     email: str
     username: str
     surname: str
     avatar: str
-    bgImg: str
+    bg_img: str
     edu: str
     num_telephone: str
     info: str
@@ -24,7 +23,7 @@ class UserUpdate(schemas.BaseUser[int]):
     username: str
     surname: str
     avatar: str
-    bgImg: str
+    bg_img: str
     edu: str
     num_telephone: str
     info: str
@@ -40,7 +39,7 @@ class UserCreate(schemas.BaseUserCreate):
     username: str
     surname: str
     avatar: str
-    bgImg: str
+    bg_img: str
     edu: str
     num_telephone: str
     info: str

@@ -17,7 +17,7 @@ user = Table(
     Column("username", String, nullable=False),
     Column("surname", String, nullable=False),
     Column("avatar", Text),
-    Column("bgImg", Text),
+    Column("bg_img", Text),
     Column("edu", String),
     Column("info", String, nullable=False),
     Column("city", String, nullable=False),
@@ -45,7 +45,7 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     avatar: Mapped[str] = mapped_column(
         Text
     )
-    bgImg: Mapped[str] = mapped_column(
+    bg_img: Mapped[str] = mapped_column(
         Text
     )
     edu: Mapped[str] = mapped_column(
