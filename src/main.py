@@ -60,8 +60,23 @@ async def create_friends(friends: Friend, db: AsyncSession = Depends(get_async_s
     await db.refresh(userFriend)
 
 
+@app.get("users/{limit}")
+async def get_all_users(limit, db: AsyncSession = Depends(get_async_session)):
+    resultUser = await db.execute(select(user).limit(int(limit)))
+    userArr = resultUser.all()
+    resUse = []
+    for userEl in userArr:
+        resUse.append(UserRead(id=userEl.id, email=userEl.email, username=userEl.username,
+                               surname=userEl.surname, avatar=userEl.avatar, bg_img=userEl.bg_img,
+                               edu=userEl.edu,
+                               num_telephone=userEl.num_telephone, info=userEl.info, city=userEl.info,
+                               is_active=userEl.is_active,
+                               is_superuser=userEl.is_superuser, is_verified=userEl.is_verified))
+    return resUse
+
+
 @app.get("/friends/users/{id}/{limit}")
-async def get_user_friends(id, limit,  db: AsyncSession = Depends(get_async_session)):
+async def get_user_friends(id, limit, db: AsyncSession = Depends(get_async_session)):
     resultFriends = await db.execute(select(friend).where(friend.c.user_id == int(id)).limit(int(limit)))
     userFriends = resultFriends.all()
     friendList = []
@@ -72,11 +87,12 @@ async def get_user_friends(id, limit,  db: AsyncSession = Depends(get_async_sess
     for frL in friendList:
         result = await db.execute(select(user).where(user.c.id == int(frL.friend_id)))
         temp = result.all()
-        resultUser.append(resultUser.append(UserRead(id=temp[0].id, email=temp[0].email, username=temp[0].username,
-                                   surname=temp[0].surname, avatar=temp[0].avatar, bg_img=temp[0].bg_img, edu=temp[0].edu,
+        resultUser.append(UserRead(id=temp[0].id, email=temp[0].email, username=temp[0].username,
+                                   surname=temp[0].surname, avatar=temp[0].avatar, bg_img=temp[0].bg_img,
+                                   edu=temp[0].edu,
                                    num_telephone=temp[0].num_telephone, info=temp[0].info, city=temp[0].info,
                                    is_active=temp[0].is_active,
-                                   is_superuser=temp[0].is_superuser, is_verified=temp[0].is_verified)))
+                                   is_superuser=temp[0].is_superuser, is_verified=temp[0].is_verified))
     return resultUser
 
 
