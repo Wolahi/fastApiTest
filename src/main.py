@@ -3,6 +3,9 @@ from fastapi_users import FastAPIUsers
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.posts.models import PostTable
+
+from src.posts.shemas import Post
 
 from .auth.base_config import auth_backend
 from .auth.manager import get_user_manager
@@ -11,6 +14,7 @@ from .auth.schemas import UserRead, UserCreate, UserUpdate
 from .database import get_async_session
 from .friends.modles import friend, FriendTable
 from .friends.shemas import Friend
+from .posts.models import post, PostTable
 
 fastapi_users = FastAPIUsers[User, int](
     get_user_manager,
@@ -48,6 +52,20 @@ app.add_middleware(
                    "Authorization"],
 )
 
+
+@app.post('/post')
+async def create_post(post: Post, db: AsyncSession = Depends(get_async_session)): 
+    post = PostTable(user_id = post.user_id , text = post.text, count_likes = post.count_likes)
+    db.add(post)
+    await db.commit()
+    await db.refresh(post)
+
+@app.get('/post/{id}')
+async def get_post_by_id(id, db: AsyncSession = Depends(get_async_session)): 
+    postInfo = await db.execute(select(post).where(post.id == id))
+    return postInfo
+
+  
 
 @app.post("/friends")
 async def create_friends(friends: Friend, db: AsyncSession = Depends(get_async_session)):
