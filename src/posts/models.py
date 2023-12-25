@@ -18,6 +18,6 @@ post = Table(
 class PostTable(Base):
     __tablename__ = "post"
     id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
-    user_id = Column('text', String , nullable=True),
-    text = Column(Integer, ForeignKey(user.c.id), nullable=False),
-    count_likes = Column(Integer, nullable=True),
+    user_id = Column(Integer, ForeignKey(user.c.id), nullable=False)
+    text = Column(String, nullable=True)
+    count_likes = Column(Integer, nullable=True)

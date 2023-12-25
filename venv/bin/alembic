@@ -1,4 +1,4 @@
-#!/Users/ilyaperelygin/fastApiTest/venv/bin/python3.11
+#!/Users/ilyaperelygin/Desktop/gitProjects/fastApiTest/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

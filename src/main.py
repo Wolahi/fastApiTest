@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Depends
 from fastapi_users import FastAPIUsers
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, column
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.posts.models import PostTable
+from sqlalchemy.sql import func
 
 from src.posts.shemas import Post
 
@@ -54,18 +54,45 @@ app.add_middleware(
 
 
 @app.post('/post')
-async def create_post(post: Post, db: AsyncSession = Depends(get_async_session)): 
-    post = PostTable(user_id = post.user_id , text = post.text, count_likes = post.count_likes)
-    db.add(post)
-    await db.commit()
-    await db.refresh(post)
+async def create_post(post: Post, db: AsyncSession = Depends(get_async_session)):
+    postTable = PostTable(user_id=post.user_id, text=post.text, count_likes=post.count_likes)
+    if postTable.text:
+        db.add(postTable)
+        await db.commit()
+        await db.refresh(postTable)
+
 
 @app.get('/post/{id}')
-async def get_post_by_id(id, db: AsyncSession = Depends(get_async_session)): 
-    postInfo = await db.execute(select(post).where(post.id == id))
-    return postInfo
+async def get_post_by_id(user_id: int, db: AsyncSession = Depends(get_async_session)):
+    postInfo = await db.execute(select(post).where(post.c.user_id == user_id))
+    postArr = postInfo.all()
+    postRead = []
+    for postTemp in postArr:
+        postRead.append(Post(id=int(postTemp.id), user_id=int(postTemp.user_id), text=str(postTemp.text),
+                             count_likes=int(postTemp.count_likes)))
+    return postRead
 
-  
+
+@app.post('/post/avg')
+async def get_avg_posts(db: AsyncSession = Depends(get_async_session)):
+    postInfo = await db.execute(select(func.avg(column("count_id_users")))
+                                .select_from(select(func.count(post.c.user_id)
+                                                    .label("count_id_users")).select_from(user)
+                                             .join(post, user.c.id == post.c.user_id)
+                                             .group_by(post.c.user_id)))
+    result = int(postInfo.first()[0])
+    return result
+
+
+@app.post('/friend/avg')
+async def get_avg_friends(db:AsyncSession = Depends(get_async_session)):
+    friendInfo = await db.execute(select(func.avg(column("count_id_users")))
+                                .select_from(select(func.count(friend.c.user_id)
+                                                    .label("count_id_users")).select_from(user)
+                                             .join(friend, user.c.id == friend.c.user_id)
+                                             .group_by(friend.c.user_id)))
+    result = int(friendInfo.first()[0])
+    return result
 
 @app.post("/friends")
 async def create_friends(friends: Friend, db: AsyncSession = Depends(get_async_session)):
@@ -78,7 +105,7 @@ async def create_friends(friends: Friend, db: AsyncSession = Depends(get_async_s
     await db.refresh(userFriend)
 
 
-@app.get("users/{limit}")
+@app.get("/users/{limit}")
 async def get_all_users(limit, db: AsyncSession = Depends(get_async_session)):
     resultUser = await db.execute(select(user).limit(int(limit)))
     userArr = resultUser.all()

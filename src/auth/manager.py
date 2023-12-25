@@ -37,7 +37,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         user_dict["hashed_password"] = self.password_helper.hash(password)
         user_dict["is_active"] = True
         user_dict["is_superuser"] = True
-        user_dict["is_verified"] = False
+        user_dict["is_verified"] = True
         created_user = await self.user_db.create(user_dict)
 
         await self.on_after_register(created_user, request)
